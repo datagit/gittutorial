@@ -1,2 +1,3 @@
 local1
 after created new branch "b1"
+after created new branch "b2"
