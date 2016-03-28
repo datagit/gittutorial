@@ -5,8 +5,8 @@ name: string
 date: datetime
 )
 
-#http://elasticsearch-cheatsheet.jolicode.com/#goto_title_2
-GET /blog/post/_validate/query?explain
+#http: //elasticsearch-cheatsheet.jolicode.com/#goto_title_2
+GET /blog/post/_validate/query?explainlowercase
 {
 "query": {
 "match": {
@@ -29,27 +29,27 @@ PUT /gb GET /blog/post/_validate/query?explain
 }
 {
 "mappings": {
-"tweet" : {
-"properties" : {
-"tweet" : {
-"type" :    "string",
+"tweet": {
+"properties": {
+"tweet": {
+"type": "string",
 "analyzer": "english"
 },
 "date" : {
-"type" :   "date"
+"type": "date"
 },
-"name" : {GET /blog/post/_validate/query?explain
+"name": {GET /blog/post/_validate/query?explain
 {
 "query": {
 "match": {
 "title": "Smith"
+}lowercase
 }
 }
-}
-"type" :   "string"
+"type": "string"
 },
-"user_id" : {
-"type" :   "long"
+"user_id": {
+"type": "long"
 }
 }
 }
@@ -59,10 +59,10 @@ PUT /gb GET /blog/post/_validate/query?explain
 #post index: gb[index=db]/tweet[type=table]/1[id]
 POST gb/tweet/1
 {
-"tweet":    "However did I manage before Elasticsearch?",
-"date":     "2014-09-14",
-"name":     "Mary Jones",
-"user_id":  1
+"tweet": "However did I manage before Elasticsearch?",
+"date": "2014-09-14",
+"name": "Mary Jones",
+"user_id": 1
 }
 
 _all ~ "However did I manage before Elasticsearch? 2014-09-14 Mary Jones 1"
@@ -72,15 +72,16 @@ WHERE name    = "John Smith"
 AND user_id = 2
 AND date    => "2014-09-15"
 #Query elastic;
-#https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html
-#https://www.elastic.co/guide/en/elasticsearch/guide/1.x/query-dsl-intro.html
-GET gb/tweet/_search
+#https: //www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html
+#https: //www.elastic.co/guide/en/elasticsearch/guide/1.x/query-dsl-intro.html
+GET gb/tweet/_search
 {
 "query": {
-"bool":{
-"must": { "match": {"user_id": 2} },
-"must": { "match": {"name": "John Smith"} },
-"must": { "range": {"date": {	"gte": "2014-09-15","format": "yyyy-MM-dd" }} }
+"bool": {
+"must": {
+"match": {"user_id": 2}},
+"must": { "match": {"name": "John Smith"}},
+"must": {"range": {"date": {"gte": "2014-09-15", "format": "yyyy-MM-dd"}}}
 }
 }
 }
@@ -88,8 +89,9 @@ GET gb/tweet/_search
 #WHERE user_id=2
 GET gb/tweet/_search
 {
-"query":{
-"match": {GET /blog/post/_validate/query?explain
+"query": {
+"match": {
+GET /blog/post/_validate/query?explain
 {
 "query": {
 "match": {
@@ -105,47 +107,48 @@ GET gb/tweet/_search
 #sorting filter
 GET gb/_search
 {
-"query" : {
-"filtered" : {
-"filter" : { "term" : { "user_id" : 3 }}
+"query": {
+"filtered": {
+"filter": {"term": {"user_id" : 3}}
 }
 },
-"sort": { "date": { "order": "desc" }}
+"sort": { "date": {"order": "desc"}}
 }
 
 GET gb/_search
 {
-"query" : {
-"filtered" : {
-"query":   { "match": { "tweet": "i" }},
-"filter" : { "term" : { "user_id" : 3 }}
+"query": {
+"filtered": {
+"query": {"match": {"tweet": "i"}},
+"filter": {
+"term": {
+"user_id": 3}}
 }
 },
 "sort": [
-{ "date":   { "order": "desc" }},
-{ "_score": { "order": "desc" }}
+{"date": {"order": "desc"}},
+{"_score": {"order": "desc"}}
 ]
 }
 
-#https://www.elastic.co/guide/en/elasticsearch/guide/1.x/boosting-by-popularity.html
+#https: //www.elastic.co/guide/en/elasticsearch/guide/1.x/boosting-by-popularity.html
 #post data for blog
 PUT /blogposts/post/1
 {
-"title":   "About popularity",
+"title": "About popularity",
 "content": "In this post we will talk about...",
-"votes":   6
+"votes": 6
 }
 
-Imagine that we have a website that hosts blog posts and enables users to vote for the blog posts that they like. We would like more-popular posts to appear higher in the results list, but still have the full-text score as the main relevance driver. We can do this easily by storing the number of votes with each blog post:
-#requirement: amout votes is more then is high
+Imagine that we have a website that hosts blog posts and enables users to vote for the blog posts that they like. We would like more-popular posts to appear higher in the results list, but still have the full-text score as the main relevance driver. We can do this easily by storing the number of votes with each blog post: #requirement: amout votes is more then is high
 GET /blogposts/post/_search
 {
 "query": {
 "function_score": {
 "query": {
 "multi_match": {
-"query":    "popularity",
-"fields": [ "title", "content" ]
+"query": "popularity",
+"fields": ["title", "content"]
 }
 },
 "field_value_factor": {
@@ -156,7 +159,108 @@ GET /blogposts/post/_search
 }
 #new_score = old_score * number_of_votes
 
-https://www.elastic.co/guide/en/elasticsearch/guide/1.x/script-score.html
+https: //www.elastic.co/guide/en/elasticsearch/guide/1.x/script-score.html
+
+#_parent, _child
+https: //www.elastic.co/guide/en/elasticsearch/reference/current/mapping-parent-field.html
+PUT my_index
+{
+"mappings": {
+"my_parent": {},
+"my_child": {
+"_parent": {
+"type": "my_parent"
+}
+}
+}
+}
+PUT my_index/my_parent/1
+{
+"text": "This is a parent document"
+}
+PUT my_index/my_child/2?parent=1
+{
+"text": "This is a child document"
+}
+PUT my_index/my_child/3?parent=1
+{
+"text": "This is another child document"
+}
+GET my_index/_search
+GET my_index/my_child/_search
+{
+"fields": ["_source", "_parent"]
+}
+
+#elasticsearch dismax query: the same ~ match but how different computing score
+https: //www.elastic.co/guide/en/elasticsearch/guide/current/_tuning_best_fields_queries.html
+https: //www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-dis-max-query.html
+"title": PUT my_dis_max/blog/1
+{
+"id": 1,
+"title": "abc 123 quick",
+"body": "this is body"
+}
+PUT my_dis_max/blog/2
+{
+"id": 2,
+"title": "this is a title abc 123 quick",
+"body": "this is a body pets"
+}
+
+#where title = "Brown fox" or body = "Brown fox"
+GET /my_index/my_type/_search
+{
+"query": {
+"bool": {
+"should": [
+{"match": {"title": "Brown fox"}},
+{"match": {"body": "Brown fox"}}
+]
+}
+}
+}
 
 
+#If the query is "albino elephant"
+#albino matching a field and elephant amtching another field => gets a higher score than "albino" matching both fields
+#score(tbl.field1 matching "albino" and tbl.field2 matching "elephant") > score(tbl.field1 matching "albino" and tbl.field2 matching "albino")
+
+GET my_index/my_type/_search
+{
+"query": {
+"dis_max": {
+"tie_breaker": 2,
+"queries": [
+{"match": {"title": "Quick pets"}},
+{"match": {"body": "Quick pets"}}
+]
+}
+}
+}
+
+minimum_should_match
+GET my_index/my_type/_search
+{
+"query": {
+"dis_max": {
+"queries": [
+{"match": {"title": "quick pets"}},
+{"match": {"body": "quick pets"}}
+]
+}
+}
+}
+
+https: //www.elastic.co/guide/en/elasticsearch/guide/master/multi-match-query.html
+#boosting: 4>3>2
+GET my_index/my_type/_search
+{
+"query": {
+"multi_match": {
+"query": "Quick",
+"fields": ["body^2", "title^3", "mainkey.subkey^4"]
+}
+}
+}
 
