@@ -1,0 +1,303 @@
+{
+  "explain": false,
+  "from": 0,
+  "size": "10",
+  "fields": ["_source"],
+  "query": {
+    "function_score": {
+      "query": {
+        "filtered": {
+          "query": {
+            "bool": {
+              "must": [
+                [{
+                  "dis_max": {
+                    "tie_breaker": 0.2,
+                    "queries": [{
+                      "query_string": {
+                        "query": "crab",
+                        "use_dis_max": true,
+                        "tie_breaker": 0.2,
+                        "default_operator": "OR",
+                        "phrase_slop": 1,
+                        "fields": ["trading_name^8", "cuisine^5", "recommendations^3", "suitable_for", "type_of_place", "dishes^3", "specialties^5", "address.zone^3", "address.building_name^8", "address.street^8", "address.block_number^3", "address.post_code", "alternative_names", "synonyms", "branch^3", "neighbourhoods^3", "mrt_stations^3", "phone_number", "fax_number", "premium_keywords", "top_of_list_keywords", "consumer_guide_keywords", "menu_search.item_name", "menu_search.item_ingredient", "menu_search.item_price"]
+                      }
+                    }, {
+                      "term": {
+                        "neighbourhoods.lowercase": "crab"
+                      }
+                    }]
+                  }
+                }]
+              ]
+            }
+          },
+          "filter": {
+            "and": {
+              "filters": [{
+                "terms": {
+                  "status": ["open", "under renovation", "new opening", "opening soon", "renamed"],
+                  "execution": "or",
+                  "_cache": true
+                }
+              }],
+              "_cache": true
+            }
+          }
+        }
+      },
+      "functions": [{
+        "filter": {
+          "range": {
+            "rnr.thumbs_up_count": {
+              "gte": 10,
+              "lte": 20
+            }
+          }
+        },
+        "boost_factor": 1.2
+      }, {
+        "filter": {
+          "range": {
+            "rnr.thumbs_up_count": {
+              "gte": 21,
+              "lte": 30
+            }
+          }
+        },
+        "boost_factor": 1.4
+      }, {
+        "filter": {
+          "range": {
+            "rnr.thumbs_up_count": {
+              "gte": 31,
+              "lte": 50
+            }
+          }
+        },
+        "boost_factor": 1.6
+      }, {
+        "filter": {
+          "range": {
+            "rnr.thumbs_up_count": {
+              "gte": 50,
+              "lte": 80
+            }
+          }
+        },
+        "boost_factor": 1.8
+      }, {
+        "filter": {
+          "range": {
+            "rnr.thumbs_up_count": {
+              "gte": 81
+            }
+          }
+        },
+        "boost_factor": 1.9
+      }, {
+        "filter": {
+          "range": {
+            "rnr.thumbs_up_percentage": {
+              "gte": 60,
+              "lte": 69.99
+            }
+          }
+        },
+        "boost_factor": 1.3
+      }, {
+        "filter": {
+          "range": {
+            "rnr.thumbs_up_percentage": {
+              "gte": 70,
+              "lte": 79.99
+            }
+          }
+        },
+        "boost_factor": 1.6
+      }, {
+        "filter": {
+          "range": {
+            "rnr.thumbs_up_percentage": {
+              "gte": 80,
+              "lte": 84.99
+            }
+          }
+        },
+        "boost_factor": 1.8
+      }, {
+        "filter": {
+          "range": {
+            "rnr.thumbs_up_percentage": {
+              "gte": 85
+            }
+          }
+        },
+        "boost_factor": 1.9
+      }, {
+        "filter": {
+          "range": {
+            "rnr.rating_overall": {
+              "gte": 2.4,
+              "lte": 2.99
+            }
+          }
+        },
+        "boost_factor": 1.1
+      }, {
+        "filter": {
+          "range": {
+            "rnr.rating_overall": {
+              "gte": 3,
+              "lte": 3.99
+            }
+          }
+        },
+        "boost_factor": 1.3
+      }, {
+        "filter": {
+          "range": {
+            "rnr.rating_overall": {
+              "gte": 4
+            }
+          }
+        },
+        "boost_factor": 1.6
+      }, {
+        "filter": {
+          "range": {
+            "rnr.review_count": {
+              "gte": 5,
+              "lte": 100
+            }
+          }
+        },
+        "boost_factor": 1.3
+      }, {
+        "filter": {
+          "range": {
+            "rnr.review_count": {
+              "gte": 101,
+              "lte": 150
+            }
+          }
+        },
+        "boost_factor": 1.6
+      }, {
+        "filter": {
+          "range": {
+            "rnr.review_count": {
+              "gte": 151,
+              "lte": 250
+            }
+          }
+        },
+        "boost_factor": 1.8
+      }, {
+        "filter": {
+          "range": {
+            "rnr.review_count": {
+              "gte": 251
+            }
+          }
+        },
+        "boost_factor": 1.9
+      }, {
+        "script_score": {
+          "lang": "groovy",
+          "params": {
+            "term": "crab",
+            "boost_factors": [{
+              "gte": 10,
+              "lte": 20,
+              "boost": 1.2
+            }, {
+              "gte": 21,
+              "lte": 30,
+              "boost": 1.4
+            }, {
+              "gte": 31,
+              "lte": 50,
+              "boost": 1.6
+            }, {
+              "gte": 51,
+              "lte": 80,
+              "boost": 1.8
+            }, {
+              "gte": 81,
+              "boost": 1.9
+            }]
+          },
+          "script": "insing.searchapi.boostdishesvotes"
+        }
+      }, {
+        "script_score": {
+          "lang": "groovy",
+          "params": {
+            "term": "crab",
+            "boost_factors": [{
+              "gte": 5,
+              "lte": 10,
+              "boost": 1.1
+            }, {
+              "gte": 11,
+              "lte": 20,
+              "boost": 1.3
+            }, {
+              "gte": 21,
+              "lte": 30,
+              "boost": 1.5
+            }, {
+              "gte": 31,
+              "boost": 1.7
+            }]
+          },
+          "script": "insing.searchapi.boostdishescount"
+        }
+      }, {
+        "filter": {
+          "term": {
+            "status": "open"
+          }
+        },
+        "boost_factor": 1.8
+      }, {
+        "filter": {
+          "term": {
+            "status": "new opening"
+          }
+        },
+        "boost_factor": 1.9
+      }, {
+        "filter": {
+          "term": {
+            "status": "opening soon"
+          }
+        },
+        "boost_factor": 1.5
+      }, {
+        "filter": {
+          "term": {
+            "status": "renamed"
+          }
+        },
+        "boost_factor": 1.4
+      }, {
+        "filter": {
+          "term": {
+            "status": "relocated"
+          }
+        },
+        "boost_factor": 1.2
+      }, {
+        "filter": {
+          "term": {
+            "status": "under renovation"
+          }
+        },
+        "boost_factor": 1.1
+      }],
+      "score_mode": "multiply"
+    }
+  }
+}
