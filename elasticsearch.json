@@ -264,3 +264,15 @@ GET my_index/my_type/_search
 }
 }
 
+https://www.elastic.co/guide/en/elasticsearch/guide/1.x/mixed-lang-fields.html
+GET /blogposts/post/_search
+{
+    "query": {
+        "multi_match": {
+            "query":    "about abc lucha",
+            "fields": [ "title*^1.5", "content" ], 
+            "type":     "most_fields",
+            "minimum_should_match": "75%" 
+        }
+    }
+}
